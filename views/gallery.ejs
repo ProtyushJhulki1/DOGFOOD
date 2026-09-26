@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html>
+<head><title>Project Gallery</title></head>
+<body>
+  <h1>Submitted Projects</h1>
+  <ul>
+    <% projects.forEach(p => { %>
+      <li><strong><%= p.title %></strong> — <%= p.summary %></li>
+    <% }); %>
+  </ul>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "name": "dogfood",
+  "version": "1.0.0",
+  "description": "A self-hostable hackathon submission and judging platform, built for the Dogfood 2026 hackathon.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProtyushJhulki1/DOGFOOD.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ProtyushJhulki1/DOGFOOD/issues"
+  },
+  "homepage": "https://github.com/ProtyushJhulki1/DOGFOOD#readme",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "ejs": "^6.0.1",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "toml": "^5.0.0"
+  },
+  "allowScripts": {
+    "bcrypt@6.0.0": true
+  }
+}

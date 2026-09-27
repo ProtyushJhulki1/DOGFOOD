@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -8,24 +6,75 @@
 </head>
 <body>
   <nav>
-    <strong>Dogfood Platform</strong>
+    <strong>DOGFOOD://platform</strong>
     <div>
+      <a href="/">Home</a>
       <% if (auth) { %>
         <a href="/dashboard">Dashboard</a>
         <a href="/logout">Logout</a>
       <% } else { %>
-        <a href="/login">Login</a>
+        <a href="/login">Log in</a>
       <% } %>
     </div>
   </nav>
-  <div class="container">
-    <h1>Submitted Projects</h1>
-    <% projects.forEach(p => { %>
-      <div class="card">
-        <h3><%= p.title %></h3>
-        <p><%= p.summary %></p>
-      </div>
-    <% }); %>
+  <div class="container" style="padding-top:2.5rem;">
+    <h1>Submitted projects</h1>
+    <input type="text" id="searchBox" placeholder="Search by title, team, or track…" class="search-box">
+    <div class="track-pills" id="trackPills">
+      <button class="track-pill active" data-track="">All tracks</button>
+    </div>
+
+    <div id="projectList">
+      <% projects.forEach((p, i) => { %>
+        <div class="ledger-row project-card" data-track="<%= p.track_name || '' %>">
+          <span class="ledger-num"><%= String(i + 1).padStart(2, '0') %></span>
+          <div>
+            <div class="ledger-title"><%= p.title %></div>
+            <div class="ledger-summary"><%= p.summary %></div>
+            <div class="ledger-meta">
+              <% if (p.team_name) { %><span><%= p.team_name %></span><% } %>
+              <% if (p.repo_url) { %><a class="ledger-link" href="<%= p.repo_url %>" target="_blank">view repo</a><% } %>
+            </div>
+          </div>
+          <% if (p.track_name) { %><span class="badge"><%= p.track_name %></span><% } %>
+        </div>
+      <% }); %>
+    </div>
   </div>
+
+  <script>
+    const cards = Array.from(document.querySelectorAll('.project-card'));
+    const searchBox = document.getElementById('searchBox');
+    const pillsWrap = document.getElementById('trackPills');
+
+    const tracks = [...new Set(cards.map(c => c.dataset.track).filter(Boolean))].sort();
+    tracks.forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'track-pill';
+      btn.dataset.track = t;
+      btn.textContent = t;
+      pillsWrap.appendChild(btn);
+    });
+
+    let activeTrack = '';
+    function applyFilters() {
+      const q = searchBox.value.toLowerCase();
+      cards.forEach(card => {
+        const matchesTrack = !activeTrack || card.dataset.track === activeTrack;
+        const matchesSearch = card.textContent.toLowerCase().includes(q);
+        card.style.display = (matchesTrack && matchesSearch) ? '' : 'none';
+      });
+    }
+
+    pillsWrap.addEventListener('click', (e) => {
+      if (e.target.tagName !== 'BUTTON') return;
+      activeTrack = e.target.dataset.track;
+      pillsWrap.querySelectorAll('.track-pill').forEach(b => b.classList.remove('active'));
+      e.target.classList.add('active');
+      applyFilters();
+    });
+
+    searchBox.addEventListener('input', applyFilters);
+  </script>
 </body>
 </html>

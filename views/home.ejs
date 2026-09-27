@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= event.name %> — Dogfood Platform</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <strong>DOGFOOD://platform</strong>
+    <div>
+      <a href="/projects">Gallery</a>
+      <% if (auth) { %>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+      <% } else { %>
+        <a href="/login">Log in</a>
+      <% } %>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <h1><%= event.name %></h1>
+    <p class="tagline">A self-hostable submission and judging ledger — built to run the event that's judging it.</p>
+
+    <div class="tier-ladder">
+      <div class="rung rung--verified">
+        <span class="rung-id">T1</span>
+        <span class="rung-track"><span class="rung-fill" style="animation-delay:100ms"></span></span>
+        <span class="rung-status">verified</span>
+      </div>
+      <div class="rung rung--verified">
+        <span class="rung-id">T2</span>
+        <span class="rung-track"><span class="rung-fill" style="animation-delay:350ms"></span></span>
+        <span class="rung-status">verified</span>
+      </div>
+      <div class="rung rung--pending">
+        <span class="rung-id">T3</span>
+        <span class="rung-track"><span class="rung-fill"></span></span>
+        <span class="rung-status">not attempted</span>
+      </div>
+      <div class="rung rung--pending">
+        <span class="rung-id">T4</span>
+        <span class="rung-track"><span class="rung-fill"></span></span>
+        <span class="rung-status">not attempted</span>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="/projects" class="btn">Browse the gallery</a>
+      <a href="/login" class="btn btn-outline">Log in</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="stat-grid">
+      <div class="stat"><div class="num"><%= projectCount %></div><div>projects submitted</div></div>
+      <div class="stat"><div class="num"><%= judgeCount %></div><div>judges seated</div></div>
+      <div class="stat"><div class="num">7/7</div><div>checks passing</div></div>
+    </div>
+  </div>
+</body>
+</html>

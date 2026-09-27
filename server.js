@@ -90,8 +90,21 @@ app.get('/dashboard', (req, res) => {
   res.redirect('/login');
 });
 
+app.get('/', (req, res) => {
+  const auth = getAuth(req);
+  const projectCount = db.prepare('SELECT COUNT(*) as c FROM projects').get().c;
+  const judgeCount = db.prepare('SELECT COUNT(*) as c FROM judges').get().c;
+  const event = db.prepare('SELECT * FROM events').get();
+  res.render('home', { auth, projectCount, judgeCount, event });
+});
+
 app.get('/projects', (req, res) => {
-  const projects = db.prepare('SELECT * FROM projects').all();
+  const projects = db.prepare(`
+    SELECT projects.*, tracks.name as track_name, teams.name as team_name
+    FROM projects
+    LEFT JOIN tracks ON tracks.id = projects.track_id
+    LEFT JOIN teams ON teams.id = projects.team_id
+  `).all();
   const auth = getAuth(req);
   res.render('gallery', { projects, auth });
 });

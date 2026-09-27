@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Organizer Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <strong>Dogfood Platform</strong>
+    <div>
+      <a href="/projects">Gallery</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    <h1>Organizer Dashboard</h1>
+    <div class="stat-grid">
+      <div class="stat"><div class="num"><%= projectCount %></div>Projects</div>
+      <div class="stat"><div class="num"><%= scoreCount %></div>Scores submitted</div>
+      <div class="stat"><div class="num"><%= judgeCount %></div>Judges</div>
+    </div>
+    <a class="btn" href="/api/export.csv">Download all scores (CSV)</a>
+  </div>
+</body>
+</html>

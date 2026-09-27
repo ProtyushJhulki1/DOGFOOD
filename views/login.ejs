@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Login — Dogfood Platform</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="login-box">
+    <h1>Dogfood Hackathon Platform</h1>
+    <p>Select a role to continue (demo login — no password needed)</p>
+
+    <% if (error) { %>
+      <p class="error"><%= error %></p>
+    <% } %>
+
+    <form method="POST" action="/login">
+      <% options.forEach(opt => { %>
+        <button type="submit" name="token" value="<%= opt.token %>" class="role-btn">
+          Log in as <%= opt.label %>
+        </button>
+      <% }); %>
+    </form>
+  </div>
+</body>
+</html>

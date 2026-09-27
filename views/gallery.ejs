@@ -1,12 +1,31 @@
+
+
 <!DOCTYPE html>
 <html>
-<head><title>Project Gallery</title></head>
+<head>
+  <title>Project Gallery</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
 <body>
-  <h1>Submitted Projects</h1>
-  <ul>
+  <nav>
+    <strong>Dogfood Platform</strong>
+    <div>
+      <% if (auth) { %>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+      <% } else { %>
+        <a href="/login">Login</a>
+      <% } %>
+    </div>
+  </nav>
+  <div class="container">
+    <h1>Submitted Projects</h1>
     <% projects.forEach(p => { %>
-      <li><strong><%= p.title %></strong> — <%= p.summary %></li>
+      <div class="card">
+        <h3><%= p.title %></h3>
+        <p><%= p.summary %></p>
+      </div>
     <% }); %>
-  </ul>
+  </div>
 </body>
 </html>

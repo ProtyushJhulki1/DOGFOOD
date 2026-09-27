@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Submit Project</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <strong>Dogfood Platform</strong>
+    <div>
+      <a href="/projects">Gallery</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    <h1>Submit Your Project</h1>
+    <p>Logged in as: <%= email %></p>
+
+    <% if (error === 'closed') { %>
+      <p class="error">Submissions are closed — the event's deadline has passed.</p>
+    <% } %>
+    <% if (error === 'forbidden') { %>
+      <p class="error">You must be logged in as a participant to submit.</p>
+    <% } %>
+    <% if (success) { %>
+      <p class="success">Project submitted successfully!</p>
+    <% } %>
+
+    <form class="submission" method="POST" action="/projects/new">
+      <label>Project Title</label>
+      <input type="text" name="title" required>
+      <label>Summary</label>
+      <textarea name="summary" rows="3" required></textarea>
+      <label>Repo URL</label>
+      <input type="url" name="repo_url" required>
+      <button type="submit" class="btn">Submit Project</button>
+    </form>
+  </div>
+</body>
+</html>

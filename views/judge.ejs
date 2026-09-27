@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Judge Dashboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <strong>Dogfood Platform</strong>
+    <div>
+      <a href="/projects">Gallery</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    <h1>Your Scores (<%= judgeId %>)</h1>
+    <table>
+      <tr><th>Project</th><th>Criteria</th><th>Comment</th></tr>
+      <% scores.forEach(s => { %>
+        <tr>
+          <td><%= s.title %></td>
+          <td><%= s.criteria %></td>
+          <td><%= s.comment || '—' %></td>
+        </tr>
+      <% }); %>
+    </table>
+  </div>
+</body>
+</html>

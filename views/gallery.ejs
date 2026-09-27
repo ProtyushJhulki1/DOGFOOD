@@ -1,42 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Project Gallery</title>
+  <title>Project Gallery — Dogfood Platform</title>
   <link rel="stylesheet" href="/style.css">
 </head>
 <body>
-  <nav>
-    <strong>DOGFOOD://platform</strong>
-    <div>
+    <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
       <a href="/">Home</a>
+      <a href="/events">Events</a>
       <% if (auth) { %>
         <a href="/dashboard">Dashboard</a>
         <a href="/logout">Logout</a>
       <% } else { %>
-        <a href="/login">Log in</a>
+        <a href="/login" class="cta">Log In</a>
       <% } %>
     </div>
   </nav>
-  <div class="container" style="padding-top:2.5rem;">
-    <h1>Submitted projects</h1>
+
+  <div class="container">
+    <div class="section-eyebrow">// ALL SUBMISSIONS</div>
+    <h1 class="page-title">Project Gallery</h1>
+
     <input type="text" id="searchBox" placeholder="Search by title, team, or track…" class="search-box">
     <div class="track-pills" id="trackPills">
       <button class="track-pill active" data-track="">All tracks</button>
     </div>
 
-    <div id="projectList">
-      <% projects.forEach((p, i) => { %>
-        <div class="ledger-row project-card" data-track="<%= p.track_name || '' %>">
-          <span class="ledger-num"><%= String(i + 1).padStart(2, '0') %></span>
-          <div>
-            <div class="ledger-title"><%= p.title %></div>
-            <div class="ledger-summary"><%= p.summary %></div>
-            <div class="ledger-meta">
-              <% if (p.team_name) { %><span><%= p.team_name %></span><% } %>
-              <% if (p.repo_url) { %><a class="ledger-link" href="<%= p.repo_url %>" target="_blank">view repo</a><% } %>
-            </div>
+    <div class="project-grid" id="projectList">
+      <% projects.forEach(p => { %>
+        <div class="card project-card" data-track="<%= p.track_name || '' %>">
+          <div class="card-top">
+            <h3><%= p.title %></h3>
+            <% if (p.track_name) { %>
+              <span class="badge" style="color:#a78bfa;border-color:rgba(167,139,250,0.4);background:rgba(167,139,250,0.08);"><%= p.track_name %></span>
+            <% } %>
           </div>
-          <% if (p.track_name) { %><span class="badge"><%= p.track_name %></span><% } %>
+          <p><%= p.summary %></p>
+          <div class="card-meta">
+            <span><%= p.team_name || '—' %></span>
+            <% if (p.repo_url) { %><a href="<%= p.repo_url %>" target="_blank">View Repo →</a><% } %>
+          </div>
         </div>
       <% }); %>
     </div>

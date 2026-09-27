@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>All Events — Hackathon Raptors</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/">Home</a>
+      <% if (auth) { %>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+      <% } else { %>
+        <a href="/login" class="cta">Log In</a>
+      <% } %>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// ALL EVENTS</div>
+    <h1 class="page-title">Every Event, One Platform</h1>
+    <p style="color:var(--muted);margin-bottom:2rem;max-width:560px;">
+      This platform runs any Hackathon Raptors event. Below are the events currently loaded — browse any one's gallery.
+    </p>
+
+    <div class="project-grid">
+      <% events.forEach(e => { %>
+        <div class="card">
+          <div class="card-top">
+            <h3><%= e.name %></h3>
+          </div>
+          <p><%= e.project_count %> project<%= e.project_count === 1 ? '' : 's' %> submitted</p>
+          <div class="card-meta">
+            <span>Event</span>
+            <a href="/projects?event=<%= e.id %>">Browse Gallery →</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</body>
+</html>

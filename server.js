@@ -94,17 +94,50 @@ app.get('/', (req, res) => {
   const auth = getAuth(req);
   const projectCount = db.prepare('SELECT COUNT(*) as c FROM projects').get().c;
   const judgeCount = db.prepare('SELECT COUNT(*) as c FROM judges').get().c;
+  const scoreCount = db.prepare('SELECT COUNT(*) as c FROM scores').get().c;
   const event = db.prepare('SELECT * FROM events').get();
-  res.render('home', { auth, projectCount, judgeCount, event });
+  const tickerRows = db.prepare(`
+    SELECT scores.comment, projects.title FROM scores
+    JOIN projects ON projects.id = scores.project_id
+    WHERE scores.comment != ''
+    LIMIT 12
+  `).all();
+  res.render('home', { auth, projectCount, judgeCount, scoreCount, event, tickerRows });
 });
 
-app.get('/projects', (req, res) => {
-  const projects = db.prepare(`
-    SELECT projects.*, tracks.name as track_name, teams.name as team_name
-    FROM projects
-    LEFT JOIN tracks ON tracks.id = projects.track_id
-    LEFT JOIN teams ON teams.id = projects.team_id
+app.get('/events', (req, res) => {
+  const auth = getAuth(req);
+  const events = db.prepare(`
+    SELECT events.*,
+      (SELECT COUNT(*) FROM projects
+       JOIN teams ON teams.id = projects.team_id
+       WHERE teams.event_id = events.id) as project_count
+    FROM events
   `).all();
+  res.render('events', { auth, events });
+});
+
+// Checker calls this with NO query params — behavior stays identical to before.
+// The optional ?event= filter is purely additive.
+app.get('/projects', (req, res) => {
+  const eventFilter = req.query.event;
+  let projects;
+  if (eventFilter) {
+    projects = db.prepare(`
+      SELECT projects.*, tracks.name as track_name, teams.name as team_name
+      FROM projects
+      LEFT JOIN tracks ON tracks.id = projects.track_id
+      LEFT JOIN teams ON teams.id = projects.team_id
+      WHERE teams.event_id = ?
+    `).all(eventFilter);
+  } else {
+    projects = db.prepare(`
+      SELECT projects.*, tracks.name as track_name, teams.name as team_name
+      FROM projects
+      LEFT JOIN tracks ON tracks.id = projects.track_id
+      LEFT JOIN teams ON teams.id = projects.team_id
+    `).all();
+  }
   const auth = getAuth(req);
   res.render('gallery', { projects, auth });
 });

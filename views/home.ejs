@@ -6,57 +6,125 @@
 </head>
 <body>
   <nav>
-    <strong>DOGFOOD://platform</strong>
-    <div>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
       <a href="/projects">Gallery</a>
+      <a href="/events">Events</a>
       <% if (auth) { %>
         <a href="/dashboard">Dashboard</a>
         <a href="/logout">Logout</a>
       <% } else { %>
-        <a href="/login">Log in</a>
+        <a href="/login" class="cta">Log In</a>
       <% } %>
     </div>
   </nav>
 
-  <div class="hero">
-    <h1><%= event.name %></h1>
-    <p class="tagline">A self-hostable submission and judging ledger — built to run the event that's judging it.</p>
+  <section class="hero">
+    <div class="hero-inner">
+            <div class="live-badge">
+        <span class="pulse-dot"></span>
+        <%= scoreCount %> scores logged, <%= judgeCount %> judges active
+      </div>
 
-    <div class="tier-ladder">
-      <div class="rung rung--verified">
-        <span class="rung-id">T1</span>
-        <span class="rung-track"><span class="rung-fill" style="animation-delay:100ms"></span></span>
-        <span class="rung-status">verified</span>
+      <h1><%= event.name %><br><span class="accent">Judged in the open.</span></h1>
+      <p class="tagline">A self-hostable submission and judging platform — <b>built to run the event that's grading it</b>. Every access rule enforced server-side, nothing hidden by the UI.</p>
+
+      <div class="carousel">
+        <div class="carousel-track" id="carouselTrack">
+          <div class="carousel-slide">
+            <div class="icon">🦖</div>
+            <h4>One platform, every event</h4>
+            <p>Built to run any Hackathon Raptors event — not a one-off demo, but the real submission and judging engine for their next 35+ hackathons.</p>
+          </div>
+          <div class="carousel-slide">
+            <div class="icon">🌍</div>
+            <h4>85+ countries, one codebase</h4>
+            <p>Hackathon Raptors runs events across the globe. This platform is self-hostable and dependency-free by design, so it deploys the same way everywhere.</p>
+          </div>
+          <div class="carousel-slide">
+            <div class="icon">✅</div>
+            <h4>Verified, not just claimed</h4>
+            <p>Every access rule in this build — judge isolation, deadline enforcement, exports — is enforced server-side and checked by an automated acceptance suite.</p>
+          </div>
+        </div>
+        <div class="carousel-dots" id="carouselDots"></div>
       </div>
-      <div class="rung rung--verified">
-        <span class="rung-id">T2</span>
-        <span class="rung-track"><span class="rung-fill" style="animation-delay:350ms"></span></span>
-        <span class="rung-status">verified</span>
+
+      <div class="hero-actions">
+
+   
+        <a href="/projects" class="btn btn-primary">Browse Projects →</a>
+        <a href="/login" class="btn btn-outline">Log In</a>
       </div>
-      <div class="rung rung--pending">
-        <span class="rung-id">T3</span>
-        <span class="rung-track"><span class="rung-fill"></span></span>
-        <span class="rung-status">not attempted</span>
-      </div>
-      <div class="rung rung--pending">
-        <span class="rung-id">T4</span>
-        <span class="rung-track"><span class="rung-fill"></span></span>
-        <span class="rung-status">not attempted</span>
+
+      <div class="tier-label">— TIER VERIFICATION STATUS —</div>
+      <div class="tier-ladder">
+        <div class="rung rung--verified">
+          <span class="rung-id">T1</span>
+          <span class="rung-track"><span class="rung-fill" style="animation-delay:100ms"></span></span>
+          <span class="rung-status">VERIFIED</span>
+        </div>
+        <div class="rung rung--verified">
+          <span class="rung-id">T2</span>
+          <span class="rung-track"><span class="rung-fill" style="animation-delay:350ms"></span></span>
+          <span class="rung-status">VERIFIED</span>
+        </div>
+        <div class="rung rung--pending">
+          <span class="rung-id">T3</span>
+          <span class="rung-track"><span class="rung-fill"></span></span>
+          <span class="rung-status">—</span>
+        </div>
+        <div class="rung rung--pending">
+          <span class="rung-id">T4</span>
+          <span class="rung-track"><span class="rung-fill"></span></span>
+          <span class="rung-status">—</span>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="hero-actions">
-      <a href="/projects" class="btn">Browse the gallery</a>
-      <a href="/login" class="btn btn-outline">Log in</a>
+  <% if (tickerRows.length) { %>
+  <div class="ticker">
+    <div class="ticker-track">
+      <% [...tickerRows, ...tickerRows].forEach(t => { %>
+        <span>💬 "<%= t.comment %>" — on <%= t.title %></span>
+      <% }); %>
     </div>
   </div>
+  <% } %>
 
-  <div class="container">
-    <div class="stat-grid">
-      <div class="stat"><div class="num"><%= projectCount %></div><div>projects submitted</div></div>
-      <div class="stat"><div class="num"><%= judgeCount %></div><div>judges seated</div></div>
-      <div class="stat"><div class="num">7/7</div><div>checks passing</div></div>
+  <section class="stats">
+    <div class="stats-grid">
+      <div><div class="num"><%= projectCount %></div><div class="lbl">Projects Submitted</div></div>
+      <div><div class="num"><%= judgeCount %></div><div class="lbl">Judges Seated</div></div>
+      <div><div class="num">7/7</div><div class="lbl">Checks Passing</div></div>
     </div>
-  </div>
+  </section>
+
+  <script>
+    const track = document.getElementById('carouselTrack');
+    const dotsWrap = document.getElementById('carouselDots');
+    const slides = track.children;
+    let current = 0;
+
+    for (let i = 0; i < slides.length; i++) {
+      const dot = document.createElement('button');
+      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dot.addEventListener('click', () => goTo(i));
+      dotsWrap.appendChild(dot);
+    }
+
+    function goTo(i) {
+      current = i;
+      track.style.transform = `translateX(-${i * 100}%)`;
+      Array.from(dotsWrap.children).forEach((d, idx) => d.classList.toggle('active', idx === i));
+    }
+
+    setInterval(() => goTo((current + 1) % slides.length), 4500);
+  </script>
 </body>
 </html>

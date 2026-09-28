@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title><%= team.name %> — Team Management</title>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/participant">Your Events</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// <%= event.name %></div>
+    <h1 class="page-title"><%= team.name %></h1>
+
+    <% if (error === 'team-full') { %><p class="error">Team is full (max <%= teamSizeLimit %>).</p><% } %>
+    <% if (error === 'already-member') { %><p class="error">That person is already on the team.</p><% } %>
+    <% if (success === 'invite-sent') { %><p class="success">Invite sent.</p><% } %>
+
+    <div class="card">
+      <h3>Members (<%= members.length %>/<%= teamSizeLimit %>)</h3>
+      <% members.forEach(m => { %><p><%= m.email %></p><% }); %>
+    </div>
+
+    <% if (members.length < teamSizeLimit) { %>
+      <div class="card">
+        <h3>Invite a Member</h3>
+        <form method="POST" action="/participant/teams/<%= team.id %>/invite" style="display:flex;gap:0.75rem;margin-top:0.75rem;">
+          <input type="email" name="email" placeholder="teammate@email.com" required style="flex:1;padding:0.7rem;border-radius:5px;border:1px solid var(--line);background:rgba(236,233,247,0.04);color:var(--text);">
+          <button type="submit" class="btn btn-primary">Send Invite</button>
+        </form>
+      </div>
+    <% } %>
+
+    <% if (invites.length) { %>
+      <div class="card">
+        <h3>Invite Status</h3>
+        <% invites.forEach(inv => { %>
+          <p><%= inv.invited_email %> — <span style="color:var(--accent);"><%= inv.status %></span></p>
+        <% }); %>
+      </div>
+    <% } %>
+  </div>
+</body>
+</html>

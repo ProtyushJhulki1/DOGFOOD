@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title><%= event.name %> — Status</title>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/organizer">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// EVENT STATUS</div>
+    <h1 class="page-title"><%= event.name %></h1>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="num"><%= status %></div><div>Status</div></div>
+      <div class="stat"><div class="num"><%= projectCount %></div><div>Projects</div></div>
+      <div class="stat"><div class="num"><%= event.submissions_close ? event.submissions_close.slice(0,10) : '—' %></div><div>Submissions Close</div></div>
+    </div>
+
+    <div class="card">
+      <h3>Schedule</h3>
+      <p>Start: <%= event.start_date || 'Not set' %></p>
+      <p>End: <%= event.end_date || 'Not set' %></p>
+      <p>Registration: <%= event.registration_open || '—' %> to <%= event.registration_close || '—' %></p>
+    </div>
+
+    <div class="card">
+      <h3>Prizes</h3>
+      <p><%= event.prizes || 'Not set' %></p>
+    </div>
+
+    <div class="card">
+      <h3>Rules</h3>
+      <p><%= event.rules || 'Not set' %></p>
+    </div>
+
+    <a href="/organizer/events/<%= event.id %>/edit" class="btn btn-outline">Edit Event</a>
+    <a href="/projects?event=<%= event.id %>" class="btn btn-outline">View Gallery</a>
+  </div>
+</body>
+</html>

@@ -1,25 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login — Dogfood Platform</title>
-  <link rel="stylesheet" href="/style.css">
+    <%- include('partials/head-assets') %>
+  <title>Login — Hackathon Raptors</title>
 </head>
 <body>
-  <div class="login-box">
-    <h1>Dogfood Hackathon Platform</h1>
-    <p>Select a role to continue (demo login — no password needed)</p>
+  <div class="login-wrap">
+    <div class="login-box">
+      <h1>Welcome Back</h1>
+      <p>Log in with your account, or use a demo role below.</p>
 
-    <% if (error) { %>
-      <p class="error"><%= error %></p>
-    <% } %>
+      <% if (error) { %><p class="error"><%= error %></p><% } %>
 
-    <form method="POST" action="/login">
-      <% options.forEach(opt => { %>
-        <button type="submit" name="token" value="<%= opt.token %>" class="role-btn">
-          Log in as <%= opt.label %>
-        </button>
-      <% }); %>
-    </form>
+      <form method="POST" action="/login/email" class="submission" style="text-align:left;background:transparent;border:none;padding:0;margin-bottom:1.5rem;">
+        <label>Email</label>
+        <input type="email" name="email" required>
+        <label>Password</label>
+        <input type="password" name="password" required>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.5rem;">Log In</button>
+      </form>
+
+      <p style="font-size:0.85rem;margin-bottom:1.5rem;">No account? <a href="/signup" style="color:var(--accent);">Sign up</a></p>
+
+      <p style="font-size:0.8rem;color:var(--dim);margin-bottom:0.75rem;">— or use a demo role —</p>
+
+      <form method="POST" action="/login">
+        <% options.forEach(opt => { %>
+          <button type="submit" name="token" value="<%= opt.token %>" class="role-btn">
+            <%= opt.label %>
+          </button>
+        <% }); %>
+      </form>
+    </div>
   </div>
 </body>
 </html>

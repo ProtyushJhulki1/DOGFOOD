@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title>Admin — Hackathon Raptors</title>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/organizer">Organizer view</a>
+      <a href="/projects">Gallery</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// ADMIN</div>
+    <h1 class="page-title">System Administration</h1>
+
+    <% if (msg === 'role-updated') { %><p class="success">Role updated.</p><% } %>
+    <% if (msg === 'user-deleted') { %><p class="success">User deleted.</p><% } %>
+    <% if (error === 'invalid-role') { %><p class="error">That role is not allowed.</p><% } %>
+    <% if (error === 'no-such-user') { %><p class="error">User not found.</p><% } %>
+    <% if (error === 'cannot-change-self') { %><p class="error">You can't change or delete your own account.</p><% } %>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="num"><%= counts.users %></div><div>Registered users</div></div>
+      <div class="stat"><div class="num"><%= counts.events %></div><div>Events</div></div>
+      <div class="stat"><div class="num"><%= counts.teams %></div><div>Teams</div></div>
+      <div class="stat"><div class="num"><%= counts.projects %></div><div>Projects</div></div>
+      <div class="stat"><div class="num"><%= counts.judges %></div><div>Judges</div></div>
+      <div class="stat"><div class="num"><%= counts.scores %></div><div>Scores</div></div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:2rem 0 1rem;">
+      <h3 style="font-family:var(--font-display);">Users</h3>
+      <a href="/admin/export/users.csv" class="btn btn-outline">Export CSV</a>
+    </div>
+    <% if (!users.length) { %>
+      <p style="color:var(--muted);">No registered users yet. Accounts created on the signup page appear here.</p>
+    <% } else { %>
+      <table>
+        <tr><th>Email</th><th>Role</th><th></th></tr>
+        <% users.forEach(function (u) { %>
+          <tr>
+            <td><%= u.email %><% if (u.email === me) { %> <span class="status">you</span><% } %></td>
+            <% if (u.email === me) { %>
+              <td><%= u.role %></td>
+              <td></td>
+            <% } else { %>
+              <td>
+                <form method="POST" action="/admin/users/<%= u.id %>/role" style="display:flex;gap:0.5rem;">
+                  <select name="role">
+                    <% roles.forEach(function (r) { %>
+                      <option value="<%= r %>" <%= u.role === r ? 'selected' : '' %>><%= r %></option>
+                    <% }); %>
+                  </select>
+                  <button type="submit" class="btn btn-outline" style="padding:0.3rem 0.8rem;">Save</button>
+                </form>
+              </td>
+              <td>
+                <form method="POST" action="/admin/users/<%= u.id %>/delete" onsubmit="return confirm('Delete this user?');">
+                  <button type="submit" class="link-btn">Delete</button>
+                </form>
+              </td>
+            <% } %>
+          </tr>
+        <% }); %>
+      </table>
+    <% } %>
+
+    <h3 style="font-family:var(--font-display);margin:2.5rem 0 1rem;">Events</h3>
+    <table>
+      <tr><th>Event</th><th>Projects</th><th></th></tr>
+      <% events.forEach(function (e) { %>
+        <tr>
+          <td><%= e.name %></td>
+          <td><%= e.project_count %></td>
+          <td>
+            <a href="/organizer/events/<%= e.id %>" style="color:var(--accent);">Status</a> ·
+            <a href="/organizer/events/<%= e.id %>/edit" style="color:var(--accent);">Edit</a>
+          </td>
+        </tr>
+      <% }); %>
+    </table>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:2.5rem 0 1rem;">
+      <h3 style="font-family:var(--font-display);">Audit Log (latest 50)</h3>
+      <a href="/admin/export/audit.csv" class="btn btn-outline">Export CSV</a>
+    </div>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Records every POST request: who made it, which route, and the HTTP status. Form contents are not stored.</p>
+    <% if (!audit.length) { %>
+      <p style="color:var(--muted);">Nothing recorded yet.</p>
+    <% } else { %>
+      <table>
+        <tr><th>Time</th><th>Actor</th><th>Role</th><th>Action</th><th>Status</th></tr>
+        <% audit.forEach(function (a) { %>
+          <tr>
+            <td class="mono"><%= a.ts %></td>
+            <td class="mono"><%= a.actor %></td>
+            <td class="mono"><%= a.role || '—' %></td>
+            <td class="mono"><%= a.method %> <%= a.route %></td>
+            <td class="mono"><%= a.status %></td>
+          </tr>
+        <% }); %>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>

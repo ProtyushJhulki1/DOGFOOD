@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title>Results — Cross-Judge Normalization</title>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/organizer">Dashboard</a>
+      <a href="/projects">Gallery</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// RESULTS</div>
+    <h1 class="page-title">Cross-Judge Normalization</h1>
+
+    <div class="card">
+      <h3>Method</h3>
+      <p>A score's total is the mean of its criteria (1 to 5). For each judge with at least <%= minScores %> scores and a non-zero spread, every total becomes a z-score: (total minus that judge's mean) divided by that judge's standard deviation. A harsh judge and a generous judge are then compared on the same footing. Judges with fewer scores use the pooled mean and standard deviation of all scores instead. A project's adjusted score is the mean of its z-scores mapped back to the 1 to 5 scale. Raw scores are never modified; everything here is recomputed from them on each load.</p>
+    </div>
+
+    <% if (!data.projects.length) { %>
+      <p style="color:var(--muted);margin-top:1.5rem;">No scores to normalize yet.</p>
+    <% } else { %>
+      <div class="stat-grid" style="margin-top:1.5rem;">
+        <div class="stat"><div class="num"><%= data.scoreCount %></div><div>Scores used</div></div>
+        <div class="stat"><div class="num"><%= data.judges.length %></div><div>Judges</div></div>
+        <div class="stat"><div class="num"><%= data.projects.length %></div><div>Projects ranked</div></div>
+      </div>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1.25rem;">Pooled mean <%= data.gMean.toFixed(2) %>, pooled standard deviation <%= data.gSd.toFixed(2) %>.</p>
+
+      <div style="display:flex;gap:0.75rem;margin-bottom:1.5rem;">
+        <a href="/organizer/results.csv" class="btn btn-primary">Export results (CSV)</a>
+        <a href="/organizer/results/scores.csv" class="btn btn-outline">Export per-score detail (CSV)</a>
+      </div>
+
+      <table>
+        <tr><th>Rank</th><th>Raw rank</th><th>Change</th><th>Project</th><th>Event</th><th>Judges</th><th>Raw</th><th>Adjusted</th><th>z</th></tr>
+        <% data.projects.forEach(function (p) { %>
+          <tr>
+            <td class="mono"><%= p.normRank %></td>
+            <td class="mono"><%= p.rawRank %></td>
+            <td class="mono"><%= p.change > 0 ? '▲ ' + p.change : (p.change < 0 ? '▼ ' + (-p.change) : '—') %></td>
+            <td><%= p.title %></td>
+            <td><%= p.event %></td>
+            <td class="mono"><%= p.judges %><%= p.fallback > 0 ? ' *' : '' %></td>
+            <td class="mono"><%= p.raw.toFixed(2) %></td>
+            <td class="mono"><%= p.adjusted.toFixed(2) %></td>
+            <td class="mono"><%= p.z.toFixed(2) %></td>
+          </tr>
+        <% }); %>
+      </table>
+      <p style="color:var(--muted);font-size:0.8rem;margin-top:0.75rem;">* includes at least one score from a judge with fewer than <%= minScores %> scores, normalized against the pooled distribution. A project scored by a single judge is a weak signal, so read the Judges column before trusting a rank.</p>
+
+      <h3 style="font-family:var(--font-display);margin:2.5rem 0 1rem;">Judge calibration</h3>
+      <table>
+        <tr><th>Judge</th><th>Scores</th><th>Mean</th><th>Std dev</th><th>Normalized against</th></tr>
+        <% data.judges.forEach(function (j) { %>
+          <tr>
+            <td class="mono"><%= j.id %></td>
+            <td class="mono"><%= j.n %></td>
+            <td class="mono"><%= j.mean.toFixed(2) %></td>
+            <td class="mono"><%= j.sd.toFixed(2) %></td>
+            <td><%= j.method === 'judge' ? 'their own scores' : 'pooled scores' %></td>
+          </tr>
+        <% }); %>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>

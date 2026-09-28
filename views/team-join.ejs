@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title>Join <%= event.name %></title>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/participant">Your Events</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// <%= event.name %></div>
+    <h1 class="page-title">Create a Team</h1>
+    <p style="color:var(--muted);margin-bottom:1.5rem;">You're not on a team for this event yet.</p>
+
+    <form class="submission" method="POST" action="/participant/events/<%= event.id %>/team">
+      <label>Team Name</label>
+      <input type="text" name="name" required>
+      <button type="submit" class="btn btn-primary">Create Team</button>
+    </form>
+  </div>
+</body>
+</html>

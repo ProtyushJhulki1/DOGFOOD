@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title><%= project.title %> — Judging</title>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/judge">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// <%= project.event_name %></div>
+    <h1 class="page-title"><%= project.title %></h1>
+
+    <% if (msg === 'draft-saved') { %><p class="success">Draft saved.</p><% } %>
+    <% if (error === 'invalid-score') { %><p class="error">Scores must be whole numbers from 1 to 5.</p><% } %>
+    <% if (error === 'all-scores-required') { %><p class="error">Fill in every score before submitting. You can save a partial draft instead.</p><% } %>
+    <% if (error === 'already-submitted') { %><p class="error">You have already submitted scores for this project.</p><% } %>
+
+    <div class="card">
+      <p><%= project.summary %></p>
+      <% if (project.repo_url) { %>
+        <div class="card-meta"><span>Repository</span><a href="<%= project.repo_url %>" target="_blank">Open →</a></div>
+      <% } %>
+    </div>
+
+    <form class="submission" method="POST">
+      <% criteria.forEach(function (c) { %>
+        <div class="score-row">
+          <label style="margin:0;"><%= c %> (1 to 5)</label>
+          <input type="number" min="1" max="5" step="1" name="<%= c %>" value="<%= values[c] == null ? '' : values[c] %>" <%= locked ? 'disabled' : '' %> style="margin:0;">
+        </div>
+      <% }); %>
+
+      <label>Comment</label>
+      <textarea name="comment" rows="4" maxlength="1000" <%= locked ? 'disabled' : '' %>><%= comment %></textarea>
+
+      <% if (locked) { %>
+        <p class="success">These scores were submitted and can no longer be edited.</p>
+      <% } else { %>
+        <div style="display:flex;gap:0.75rem;">
+          <button type="submit" class="btn btn-outline" formaction="/judge/projects/<%= encodeURIComponent(project.project_id) %>/draft">Save draft</button>
+          <button type="submit" class="btn btn-primary" formaction="/judge/projects/<%= encodeURIComponent(project.project_id) %>/submit" onclick="return confirm('Submit final scores? You cannot edit them afterwards.');">Submit scores</button>
+        </div>
+      <% } %>
+    </form>
+  </div>
+</body>
+</html>

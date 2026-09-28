@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <%- include('partials/head-assets') %>
   <title><%= event.name %> — Dogfood Platform</title>
-  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <nav>
@@ -99,32 +99,11 @@
 
   <section class="stats">
     <div class="stats-grid">
-      <div><div class="num"><%= projectCount %></div><div class="lbl">Projects Submitted</div></div>
-      <div><div class="num"><%= judgeCount %></div><div class="lbl">Judges Seated</div></div>
+      <div><div class="num" data-count="<%= projectCount %>">0</div><div class="lbl">Projects Submitted</div></div>
+      <div><div class="num" data-count="<%= judgeCount %>">0</div><div class="lbl">Judges Seated</div></div>
       <div><div class="num">7/7</div><div class="lbl">Checks Passing</div></div>
     </div>
   </section>
 
-  <script>
-    const track = document.getElementById('carouselTrack');
-    const dotsWrap = document.getElementById('carouselDots');
-    const slides = track.children;
-    let current = 0;
-
-    for (let i = 0; i < slides.length; i++) {
-      const dot = document.createElement('button');
-      dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
-      dot.addEventListener('click', () => goTo(i));
-      dotsWrap.appendChild(dot);
-    }
-
-    function goTo(i) {
-      current = i;
-      track.style.transform = `translateX(-${i * 100}%)`;
-      Array.from(dotsWrap.children).forEach((d, idx) => d.classList.toggle('active', idx === i));
-    }
-
-    setInterval(() => goTo((current + 1) % slides.length), 4500);
-  </script>
 </body>
 </html>

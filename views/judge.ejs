@@ -1,26 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <%- include('partials/head-assets') %>
   <title>Judge Dashboard</title>
-  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <nav>
-    <strong>Dogfood Platform</strong>
-    <div>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
       <a href="/projects">Gallery</a>
+      <a href="/judge/records">Records</a>
+      <a href="/judge/export.csv">Export CSV</a>
       <a href="/logout">Logout</a>
     </div>
   </nav>
+
   <div class="container">
-    <h1>Your Scores (<%= judgeId %>)</h1>
+    <div class="section-eyebrow">// JUDGE (<%= judgeId %>)</div>
+    <h1 class="page-title">Judge Dashboard</h1>
+
+    <% if (msg === 'invite-accepted') { %><p class="success">Invitation accepted. Its projects are now assigned to you.</p><% } %>
+    <% if (msg === 'invite-declined') { %><p class="success">Invitation declined.</p><% } %>
+    <% if (msg === 'score-submitted') { %><p class="success">Scores submitted.</p><% } %>
+
+    <div class="stat-grid">
+      <div class="stat"><div class="num"><%= total %></div><div>Assigned</div></div>
+      <div class="stat"><div class="num"><%= done %></div><div>Submitted</div></div>
+      <div class="stat"><div class="num"><%= pct %>%</div><div>Progress</div></div>
+    </div>
+    <div class="progress"><div class="progress-fill" style="width:<%= pct %>%"></div></div>
+
+    <% if (invites.length) { %>
+      <h3 style="font-family:var(--font-display);margin-bottom:1rem;">Pending Invitations</h3>
+      <% invites.forEach(function (inv) { %>
+        <div class="card">
+          <p>You have been invited to judge <b><%= inv.event_name %></b></p>
+          <div style="display:flex;gap:0.75rem;margin-top:0.75rem;">
+            <form method="POST" action="/judge/invites/<%= inv.id %>/accept">
+              <button type="submit" class="btn btn-primary">Accept</button>
+            </form>
+            <form method="POST" action="/judge/invites/<%= inv.id %>/reject">
+              <button type="submit" class="btn btn-outline">Decline</button>
+            </form>
+          </div>
+        </div>
+      <% }); %>
+    <% } %>
+
+    <h3 style="font-family:var(--font-display);margin:2rem 0 1rem;">Your Events</h3>
+    <% if (!events.length) { %><p style="color:var(--muted);">No events yet.</p><% } %>
+    <% events.forEach(function (e) { %>
+      <div class="card"><h3><%= e.name %></h3></div>
+    <% }); %>
+
+    <h3 style="font-family:var(--font-display);margin:2rem 0 1rem;">Assigned Projects</h3>
     <table>
-      <tr><th>Project</th><th>Criteria</th><th>Comment</th></tr>
-      <% scores.forEach(s => { %>
+      <tr><th>Project</th><th>Event</th><th>Status</th><th></th></tr>
+      <% projects.forEach(function (p) { %>
         <tr>
-          <td><%= s.title %></td>
-          <td><%= s.criteria %></td>
-          <td><%= s.comment || '—' %></td>
+          <td><%= p.title %></td>
+          <td><%= p.event_name %></td>
+          <td><span class="status status--<%= p.status %>"><%= p.status %></span></td>
+          <td><a href="/judge/projects/<%= encodeURIComponent(p.project_id) %>" style="color:var(--accent);"><%= p.status === 'submitted' ? 'View' : 'Judge' %> →</a></td>
         </tr>
       <% }); %>
     </table>

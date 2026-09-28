@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title>Participation Records</title>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/judge">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// PARTICIPATION RECORDS</div>
+    <h1 class="page-title"><%= judgeName %></h1>
+    <p style="color:var(--muted);margin-bottom:1.5rem;">Judge ID <%= judgeId %>. Generated <%= generatedAt %>. This is an unsigned summary of your activity on this platform.</p>
+
+    <table>
+      <tr><th>Event</th><th>Assigned</th><th>Submitted</th><th>Status</th></tr>
+      <% records.forEach(function (r) { %>
+        <tr>
+          <td><%= r.event_name %></td>
+          <td><%= r.assigned %></td>
+          <td><%= r.submitted %></td>
+          <td><span class="status <%= r.submitted === r.assigned ? 'status--submitted' : 'status--draft' %>"><%= r.submitted === r.assigned ? 'complete' : 'in progress' %></span></td>
+        </tr>
+      <% }); %>
+    </table>
+
+    <p style="margin-top:1.5rem;"><button class="btn btn-outline" onclick="window.print()">Print this record</button></p>
+  </div>
+</body>
+</html>

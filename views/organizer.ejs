@@ -1,25 +1,58 @@
+
+
 <!DOCTYPE html>
 <html>
 <head>
+    <%- include('partials/head-assets') %>
   <title>Organizer Dashboard</title>
-  <link rel="stylesheet" href="/style.css">
 </head>
 <body>
   <nav>
-    <strong>Dogfood Platform</strong>
-    <div>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
       <a href="/projects">Gallery</a>
       <a href="/logout">Logout</a>
     </div>
   </nav>
+
   <div class="container">
-    <h1>Organizer Dashboard</h1>
+    <div class="section-eyebrow">// ORGANIZER</div>
+    <h1 class="page-title">Dashboard</h1>
+
     <div class="stat-grid">
-      <div class="stat"><div class="num"><%= projectCount %></div>Projects</div>
-      <div class="stat"><div class="num"><%= scoreCount %></div>Scores submitted</div>
-      <div class="stat"><div class="num"><%= judgeCount %></div>Judges</div>
+      <div class="stat"><div class="num"><%= projectCount %></div><div>Projects</div></div>
+      <div class="stat"><div class="num"><%= scoreCount %></div><div>Scores submitted</div></div>
+      <div class="stat"><div class="num"><%= judgeCount %></div><div>Judges</div></div>
     </div>
-    <a class="btn" href="/api/export.csv">Download all scores (CSV)</a>
+      <a class="btn btn-primary" href="/api/export.csv">Download all scores (CSV)</a>
+      <a class="btn btn-outline" href="/organizer/results" style="margin-left:0.75rem;">Results &amp; normalization</a>
+
+    <div style="margin-top:3rem;display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="font-family:var(--font-display);">Your Events</h3>
+      <a href="/organizer/events/new" class="btn btn-outline">+ New Event</a>
+    </div>
+
+    <div class="project-grid" style="margin-top:1.5rem;">
+      <% events.forEach(function (e) { %>
+        <div class="card">
+          <div class="card-top"><h3><%= e.name %></h3></div>
+          <p><%= e.project_count %> project<%= e.project_count === 1 ? '' : 's' %></p>
+          <div class="card-meta">
+            <a href="/organizer/events/<%= e.id %>">View Status</a>
+            <a href="/organizer/events/<%= e.id %>/edit">Edit</a>
+          </div>
+          <% if (e.id !== 'evt_01') { %>
+            <form method="POST" action="/organizer/events/<%= e.id %>/delete" style="margin-top:0.6rem;" onsubmit="return confirm('Delete this event and its projects?');">
+              <button type="submit" class="link-btn">Delete Event</button>
+            </form>
+          <% } %>
+        </div>
+      <% }); %>
+    </div>
   </div>
 </body>
 </html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title><%= mode === 'create' ? 'New Event' : 'Edit Event' %> — Organizer</title>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/organizer">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// <%= mode === 'create' ? 'NEW EVENT' : 'EDIT EVENT' %></div>
+    <h1 class="page-title"><%= mode === 'create' ? 'Create Event' : 'Edit: ' + event.name %></h1>
+
+    <% if (mode === 'edit' && event.id === 'evt_01') { %>
+      <p class="error" style="border:1px solid var(--danger);padding:0.75rem 1rem;border-radius:6px;">
+        ⚠ This is the live graded event. Changing "Submissions Close" to a future date will break the acceptance checker's closed-submission test.
+      </p>
+    <% } %>
+
+    <form class="submission" method="POST" action="<%= mode === 'create' ? '/organizer/events/new' : '/organizer/events/' + event.id + '/edit' %>">
+      <label>Event Name</label>
+      <input type="text" name="name" value="<%= event.name || '' %>" required>
+
+      <label>Start Date</label>
+      <input type="datetime-local" name="start_date" value="<%= event.start_date || '' %>">
+
+      <label>End Date</label>
+      <input type="datetime-local" name="end_date" value="<%= event.end_date || '' %>">
+
+      <label>Registration Opens</label>
+      <input type="datetime-local" name="registration_open" value="<%= event.registration_open || '' %>">
+
+      <label>Registration Closes</label>
+      <input type="datetime-local" name="registration_close" value="<%= event.registration_close || '' %>">
+
+      <label>Submissions Close</label>
+      <input type="datetime-local" name="submissions_close" value="<%= event.submissions_close ? event.submissions_close.slice(0,16) : '' %>">
+
+      <label>Prizes</label>
+      <textarea name="prizes" rows="3"><%= event.prizes || '' %></textarea>
+
+      <label>Rules</label>
+      <textarea name="rules" rows="4"><%= event.rules || '' %></textarea>
+
+      <button type="submit" class="btn btn-primary"><%= mode === 'create' ? 'Create Event' : 'Save Changes' %></button>
+    </form>
+  </div>
+</body>
+</html>

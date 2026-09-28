@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title>Your Events — Hackathon Raptors</title>
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/events">All Events</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// PARTICIPANT</div>
+    <h1 class="page-title">Welcome, <%= email %></h1>
+
+    <% if (error === 'team-full') { %><p class="error">That team is already full.</p><% } %>
+    <% if (success === 'invite-declined') { %><p class="success">Invite declined.</p><% } %>
+
+    <% if (pendingInvites.length) { %>
+      <h3 style="font-family:var(--font-display);margin-bottom:1rem;">Pending Invites</h3>
+      <% pendingInvites.forEach(function (inv) { %>
+        <div class="card">
+          <p>Invitation to join <%= inv.team_name %></p>
+          <div style="display:flex;gap:0.75rem;margin-top:0.75rem;">
+            <form method="POST" action="/invite/<%= inv.token %>/accept">
+              <button type="submit" class="btn btn-primary">Accept</button>
+            </form>
+            <form method="POST" action="/invite/<%= inv.token %>/reject">
+              <button type="submit" class="btn btn-outline">Decline</button>
+            </form>
+          </div>
+        </div>
+      <% }); %>
+    <% } %>
+
+    <h3 style="font-family:var(--font-display);margin:2rem 0 1rem;">Events</h3>
+    <div class="project-grid">
+      <% events.forEach(function (e) { %>
+        <div class="card">
+          <div class="card-top"><h3><%= e.name %></h3></div>
+          <p><%= teamByEvent[e.id] ? 'You have a team in this event' : 'No team yet' %></p>
+          <div class="card-meta">
+            <a href="/participant/events/<%= e.id %>"><%= teamByEvent[e.id] ? 'Manage Team →' : 'Create/Join Team →' %></a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</body>
+</html>

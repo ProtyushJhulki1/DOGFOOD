@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <%- include('partials/head-assets') %>
+  <title>Sign Up — Hackathon Raptors</title>
+</head>
+<body>
+  <div class="login-wrap">
+    <div class="login-box">
+      <h1>Create Account</h1>
+      <p>Sign up as a participant to submit projects.</p>
+
+      <% if (error) { %><p class="error"><%= error %></p><% } %>
+
+      <form method="POST" action="/signup" class="submission" style="text-align:left;background:transparent;border:none;padding:0;">
+        <label>Email</label>
+        <input type="email" name="email" required>
+        <label>Password</label>
+        <input type="password" name="password" minlength="6" required>
+        <button type="submit" class="btn btn-primary" style="width:100%;margin-top:0.5rem;">Sign Up</button>
+      </form>
+
+      <p style="margin-top:1.5rem;font-size:0.85rem;">Already have an account? <a href="/login" style="color:var(--accent);">Log in</a></p>
+    </div>
+  </div>
+</body>
+</html>

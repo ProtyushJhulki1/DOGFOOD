@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= project.title %> — Voting</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/vote/<%= encodeURIComponent(event.id) %>">Back to voting</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// <%= event.name %></div>
+    <h1 class="page-title"><%= project.title %></h1>
+
+    <% if (msgText) { %><p class="success"><%= msgText %></p><% } %>
+    <% if (errorText) { %><p class="error"><%= errorText %></p><% } %>
+
+    <div class="card">
+      <p><%= project.summary %></p>
+      <% if (project.repo_url) { %>
+        <div class="card-meta"><span>Repository</span><a href="<%= project.repo_url %>" target="_blank" rel="noopener noreferrer">Open →</a></div>
+      <% } %>
+    </div>
+
+    <% if (elig.ok && status === 'open') { %>
+      <div style="margin:1rem 0 2rem;">
+        <% if (own) { %>
+          <p style="color:var(--muted);">This is your team's project, so you can't vote for it.</p>
+        <% } else if (voted) { %>
+          <form method="POST" action="/vote/<%= encodeURIComponent(event.id) %>/projects/<%= encodeURIComponent(project.id) %>/unvote">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <button type="submit" class="btn btn-outline">Remove my vote</button>
+          </form>
+        <% } else { %>
+          <form method="POST" action="/vote/<%= encodeURIComponent(event.id) %>/projects/<%= encodeURIComponent(project.id) %>/vote">
+            <input type="hidden" name="_csrf" value="<%= csrf %>">
+            <button type="submit" class="btn btn-primary">Vote for this project</button>
+          </form>
+        <% } %>
+      </div>
+    <% } %>
+
+    <% if (showComments) { %>
+      <h3 style="font-family:var(--font-display);margin:1.5rem 0 1rem;">Comments</h3>
+      <% if (!comments.length) { %><p style="color:var(--muted);">No comments yet.</p><% } %>
+      <% comments.forEach(function (c) { %>
+        <div class="card">
+          <p><%= c.body %></p>
+          <div class="card-meta">
+            <span><%= c.author.split('@')[0] %> · <%= c.created_at.slice(0, 16).replace('T', ' ') %> UTC</span>
+            <% if (isAdmin) { %>
+              <form method="POST" action="/vote/comments/<%= c.id %>/delete" onsubmit="return confirm('Remove this comment?');">
+                <input type="hidden" name="_csrf" value="<%= csrf %>">
+                <button type="submit" class="link-btn">Remove</button>
+              </form>
+            <% } %>
+          </div>
+        </div>
+      <% }); %>
+
+      <% if (elig.ok && status === 'open') { %>
+        <form class="submission" method="POST" action="/vote/<%= encodeURIComponent(event.id) %>/projects/<%= encodeURIComponent(project.id) %>/comments" style="margin-top:1.5rem;">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <label>Add a comment (max 500 characters)</label>
+          <textarea name="body" rows="3" maxlength="500" required></textarea>
+          <button type="submit" class="btn btn-primary">Post comment</button>
+        </form>
+      <% } %>
+    <% } %>
+  </div>
+</body>
+</html>

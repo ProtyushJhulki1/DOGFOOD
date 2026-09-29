@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Vote — <%= event.name %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <% function statusClass(s) { return s === 'open' ? 'status--submitted' : (s === 'upcoming' ? 'status--draft' : ''); } %>
+  <% function fmt(iso) { return iso ? iso.slice(0, 16).replace('T', ' ') + ' UTC' : 'not set'; } %>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/vote">All voting</a>
+      <a href="/projects">Gallery</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// <%= event.name %></div>
+    <h1 class="page-title">Community Voting</h1>
+
+    <p style="margin-bottom:1rem;">
+      <span class="status <%= statusClass(status) %>"><%= status %></span>
+      <span style="color:var(--muted);font-size:0.85rem;margin-left:0.75rem;">Opens <%= fmt(cfg.opens_at) %> · Closes <%= fmt(cfg.closes_at) %></span>
+    </p>
+
+    <% if (msgText) { %><p class="success"><%= msgText %></p><% } %>
+    <% if (errorText) { %><p class="error"><%= errorText %></p><% } %>
+
+    <% if (status === 'disabled' && auth.role !== 'admin') { %>
+      <p style="color:var(--muted);">Voting is not active for this event.</p>
+    <% } else { %>
+
+      <% if (auth.role !== 'admin') { %>
+        <% if (!elig.ok && elig.reason === 'account') { %>
+          <p class="error">Only participant accounts can vote. Log in with an account created on the signup page.</p>
+        <% } else if (!elig.ok) { %>
+          <p class="error">Your account is not on the voter list for this event.</p>
+        <% } else { %>
+          <div class="card"><p>Votes left: <b><%= votesLeft %></b> of <%= cfg.votes_per_voter %>. One vote per project. You can remove a vote while voting is open.</p></div>
+        <% } %>
+      <% } %>
+
+      <% if (results) { %>
+        <h3 style="font-family:var(--font-display);margin:1.5rem 0 1rem;">Results</h3>
+        <table>
+          <tr><th>Rank</th><th>Project</th><th>Votes</th></tr>
+          <% results.forEach(function (r) { %>
+            <tr><td class="mono"><%= r.rank %></td><td><%= r.title %></td><td class="mono"><%= r.votes %></td></tr>
+          <% }); %>
+        </table>
+      <% } else { %>
+        <div class="card"><p>Results stay hidden until voting closes.</p></div>
+      <% } %>
+
+      <h3 style="font-family:var(--font-display);margin:2rem 0 0.5rem;">Projects</h3>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Shown in a random order that is the same every time you visit but differs from voter to voter.</p>
+
+      <% projects.forEach(function (p) { %>
+        <div class="card">
+          <div class="card-top"><h3><%= p.title %></h3></div>
+          <p><%= p.summary %></p>
+          <div class="card-meta">
+            <a href="/vote/<%= encodeURIComponent(event.id) %>/projects/<%= encodeURIComponent(p.id) %>">Details<%= cfg.comments_enabled ? ' and comments' : '' %> →</a>
+            <% if (elig.ok && status === 'open') { %>
+              <% if (p.own) { %>
+                <span>Your team's project</span>
+              <% } else if (p.voted) { %>
+                <form method="POST" action="/vote/<%= encodeURIComponent(event.id) %>/projects/<%= encodeURIComponent(p.id) %>/unvote">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <button type="submit" class="btn btn-outline" style="padding:0.3rem 0.8rem;">Remove vote</button>
+                </form>
+              <% } else { %>
+                <form method="POST" action="/vote/<%= encodeURIComponent(event.id) %>/projects/<%= encodeURIComponent(p.id) %>/vote">
+                  <input type="hidden" name="_csrf" value="<%= csrf %>">
+                  <button type="submit" class="btn btn-primary" style="padding:0.3rem 0.8rem;">Vote</button>
+                </form>
+              <% } %>
+            <% } else if (p.voted) { %>
+              <span>You voted</span>
+            <% } %>
+          </div>
+        </div>
+      <% }); %>
+    <% } %>
+  </div>
+</body>
+</html>

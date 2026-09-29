@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pairwise Admin — <%= event.name %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/admin">Admin</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="section-eyebrow">// ADMIN · PAIRWISE</div>
+    <h1 class="page-title"><%= event.name %></h1>
+    <p style="margin-bottom:1.5rem;">
+      <% events.forEach(function (e) { %>
+        <a href="/admin/pairwise/<%= encodeURIComponent(e.id) %>" class="status <%= e.id === event.id ? 'status--submitted' : '' %>" style="margin-right:0.5rem;"><%= e.name %> · <%= e.enabled ? 'on' : 'off' %></a>
+      <% }); %>
+    </p>
+    <% if (msgText) { %><p class="success"><%= msgText %></p><% } %>
+
+    <form method="POST" action="/admin/pairwise/<%= encodeURIComponent(event.id) %>/config" style="margin-bottom:2rem;">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <label style="display:flex;align-items:center;gap:0.5rem;text-transform:none;">
+        <input type="checkbox" name="enabled" value="1" style="width:auto;margin:0;" <%= enabled ? 'checked' : '' %>> Pairwise comparisons enabled for judges assigned to this event
+      </label>
+      <br><button type="submit" class="btn btn-primary">Save</button>
+    </form>
+
+    <div class="card">
+      <h3>Method</h3>
+      <p>Judges are shown two projects and pick the stronger one, or mark it too close to call. Strength is estimated with the Bradley-Terry model using the MM algorithm (Hunter, 2004): each project gets a strength score such that the probability project i beats project j is theta_i / (theta_i + theta_j). Every project also gets one virtual win and one virtual loss against a fixed-strength anchor opponent. This keeps the estimate finite and defined even for a project no judge has compared yet, or one that has lost every real comparison, rather than letting the score diverge or hit zero. Projects with no comparisons sit at the anchor value (1.0), not at the top or bottom.</p>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:2rem 0 1rem;">
+      <h3 style="font-family:var(--font-display);">Recovered Ranking (<%= result.totalComparisons %> comparisons so far)</h3>
+      <a href="/admin/pairwise/<%= encodeURIComponent(event.id) %>/ranking.csv" class="btn btn-outline">Export CSV</a>
+    </div>
+    <% if (!result.list.length) { %>
+      <p style="color:var(--muted);">No projects in this event yet.</p>
+    <% } else { %>
+      <table>
+        <tr><th>Rank</th><th>Project</th><th>Strength</th><th>Comparisons</th></tr>
+        <% result.list.forEach(function (r) { %>
+          <tr>
+            <td class="mono"><%= r.rank %></td>
+            <td><%= r.title %></td>
+            <td class="mono"><%= r.strength.toFixed(3) %></td>
+            <td class="mono"><%= r.comparisons %><%= r.noData ? ' (no data)' : '' %></td>
+          </tr>
+        <% }); %>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>

@@ -26,6 +26,8 @@ app.use(session({
 require('./results')(app, db, requirePageRole, csvCell, judgeAssignments, judgeSubmittedMap);
 
 require('./admin')(app, db, getAuth, requirePageRole, csvCell);
+require('./voting')(app, db, getAuth, requirePageRole, csvCell);
+require('./pairwise')(app, db, getAuth, requirePageRole, csvCell, judgeAssignments);
 
 function tokenInfo(token) {
   if (!token) return null;

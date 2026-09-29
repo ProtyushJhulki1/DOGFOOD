@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Voting Admin — Hackathon Raptors</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <% function statusClass(s) { return s === 'open' ? 'status--submitted' : (s === 'upcoming' ? 'status--draft' : ''); } %>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/admin">Admin</a>
+      <a href="/vote/<%= encodeURIComponent(event.id) %>">Voter view</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// ADMIN · VOTING</div>
+    <h1 class="page-title"><%= event.name %></h1>
+
+    <p style="margin-bottom:1.5rem;">
+      <% events.forEach(function (e) { %>
+        <a href="/admin/voting/<%= encodeURIComponent(e.id) %>" class="status <%= e.id === event.id ? 'status--submitted' : '' %>" style="margin-right:0.5rem;"><%= e.name %> · <%= e.status %></a>
+      <% }); %>
+    </p>
+
+    <% if (msgText) { %><p class="success"><%= msgText %></p><% } %>
+    <% if (errorText) { %><p class="error"><%= errorText %></p><% } %>
+
+    <h3 style="font-family:var(--font-display);margin-bottom:1rem;">Settings <span class="status <%= statusClass(status) %>"><%= status %></span></h3>
+    <form class="submission" method="POST" action="/admin/voting/<%= encodeURIComponent(event.id) %>/config">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+
+      <label style="display:flex;align-items:center;gap:0.5rem;text-transform:none;">
+        <input type="checkbox" name="enabled" value="1" style="width:auto;margin:0;" <%= cfg.enabled ? 'checked' : '' %>> Voting enabled
+      </label>
+      <br>
+      <label>Opens (UTC)</label>
+      <input type="datetime-local" name="opens_at" value="<%= cfg.opens_at ? cfg.opens_at.slice(0, 16) : '' %>">
+      <label>Closes (UTC)</label>
+      <input type="datetime-local" name="closes_at" value="<%= cfg.closes_at ? cfg.closes_at.slice(0, 16) : '' %>">
+      <label>Votes per voter (1 to 20, at most one per project)</label>
+      <input type="number" name="votes_per_voter" min="1" max="20" value="<%= cfg.votes_per_voter %>">
+      <label>Who can vote</label>
+      <select name="eligibility" style="width:100%;margin-bottom:1.1rem;">
+        <option value="open" <%= cfg.eligibility === 'open' ? 'selected' : '' %>>Any logged-in participant account</option>
+        <option value="allowlist" <%= cfg.eligibility === 'allowlist' ? 'selected' : '' %>>Only emails on the voter list below</option>
+      </select>
+      <label style="display:flex;align-items:center;gap:0.5rem;text-transform:none;">
+        <input type="checkbox" name="comments_enabled" value="1" style="width:auto;margin:0;" <%= cfg.comments_enabled ? 'checked' : '' %>> Comments enabled
+      </label>
+      <br>
+      <label style="display:flex;align-items:center;gap:0.5rem;text-transform:none;">
+        <input type="checkbox" name="results_during" value="1" style="width:auto;margin:0;" <%= cfg.results_during ? 'checked' : '' %>> Show running totals to voters while voting is open (off = hidden until it closes)
+      </label>
+      <br>
+      <button type="submit" class="btn btn-primary">Save settings</button>
+    </form>
+
+    <h3 style="font-family:var(--font-display);margin:2.5rem 0 1rem;">Voter list</h3>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Used when "Who can vote" is set to the voter list. Voters must still sign up with the same email.</p>
+    <form class="submission" method="POST" action="/admin/voting/<%= encodeURIComponent(event.id) %>/allowlist/add">
+      <input type="hidden" name="_csrf" value="<%= csrf %>">
+      <label>Add emails (separate with spaces, commas or new lines)</label>
+      <textarea name="emails" rows="3"></textarea>
+      <button type="submit" class="btn btn-outline">Add to list</button>
+    </form>
+    <% if (allowlist.length) { %>
+      <table style="margin-top:1rem;">
+        <tr><th>Email</th><th></th></tr>
+        <% allowlist.forEach(function (a) { %>
+          <tr>
+            <td><%= a.email %></td>
+            <td>
+              <form method="POST" action="/admin/voting/<%= encodeURIComponent(event.id) %>/allowlist/remove">
+                <input type="hidden" name="_csrf" value="<%= csrf %>">
+                <input type="hidden" name="email" value="<%= a.email %>">
+                <button type="submit" class="link-btn">Remove</button>
+              </form>
+            </td>
+          </tr>
+        <% }); %>
+      </table>
+    <% } %>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:2.5rem 0 1rem;">
+      <h3 style="font-family:var(--font-display);">Tally (admins always see this)</h3>
+      <a href="/admin/voting/<%= encodeURIComponent(event.id) %>/results.csv" class="btn btn-outline">Export CSV</a>
+    </div>
+    <table>
+      <tr><th>Rank</th><th>Project</th><th>Votes</th></tr>
+      <% tally.forEach(function (r) { %>
+        <tr><td class="mono"><%= r.rank %></td><td><%= r.title %></td><td class="mono"><%= r.votes %></td></tr>
+      <% }); %>
+    </table>
+
+    <h3 style="font-family:var(--font-display);margin:2.5rem 0 1rem;">Shared-network signal</h3>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1rem;">Advisory only. Lists network addresses (hashed) that cast votes for three or more different accounts. Shared Wi-Fi and Docker on one machine will also show up here, so treat it as a prompt to look closer, not as proof.</p>
+    <% if (!advisory.length) { %>
+      <p style="color:var(--muted);">Nothing flagged.</p>
+    <% } else { %>
+      <table>
+        <tr><th>Network (hash)</th><th>Accounts</th><th>Votes</th></tr>
+        <% advisory.forEach(function (a) { %>
+          <tr><td class="mono"><%= a.ip_hash %></td><td class="mono"><%= a.voters %></td><td class="mono"><%= a.votes %></td></tr>
+        <% }); %>
+      </table>
+    <% } %>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin:2.5rem 0 1rem;">
+      <h3 style="font-family:var(--font-display);">Voting audit trail (latest 50)</h3>
+      <a href="/admin/voting/<%= encodeURIComponent(event.id) %>/audit.csv" class="btn btn-outline">Export CSV</a>
+    </div>
+    <% if (!audit.length) { %>
+      <p style="color:var(--muted);">Nothing recorded yet.</p>
+    <% } else { %>
+      <table>
+        <tr><th>Time</th><th>Actor</th><th>Action</th><th>Project</th><th>Detail</th></tr>
+        <% audit.forEach(function (a) { %>
+          <tr>
+            <td class="mono"><%= a.ts %></td>
+            <td class="mono"><%= a.actor %></td>
+            <td class="mono"><%= a.action %></td>
+            <td class="mono"><%= a.project_id || '—' %></td>
+            <td class="mono" style="word-break:break-all;"><%= a.detail || '' %></td>
+          </tr>
+        <% }); %>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>

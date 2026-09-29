@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Pairwise — <%= event.name %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/judge/pairwise">All events</a>
+      <a href="/judge">Dashboard</a>
+      <a href="/logout">Logout</a>
+    </div>
+  </nav>
+  <div class="container">
+    <div class="section-eyebrow">// <%= event.name %></div>
+    <h1 class="page-title">Which project is stronger?</h1>
+    <% if (msgText) { %><p class="success"><%= msgText %></p><% } %>
+    <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem;">You've compared <%= doneCount %> pair<%= doneCount === 1 ? '' : 's' %> so far. Each pair is only shown to you once.</p>
+
+    <% if (!pair) { %>
+      <p style="color:var(--muted);">This event needs at least 2 projects before comparisons can start.</p>
+    <% } else if (pair.exhausted) { %>
+      <div class="card"><p>You've compared every pair of projects in this event. Thank you.</p></div>
+    <% } else { %>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:1rem;align-items:stretch;">
+        <form method="POST" action="/judge/pairwise/<%= encodeURIComponent(event.id) %>/compare">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="hidden" name="a" value="<%= pair.a.id %>">
+          <input type="hidden" name="b" value="<%= pair.b.id %>">
+          <input type="hidden" name="winner" value="<%= pair.a.id %>">
+          <button type="submit" class="card" style="width:100%;text-align:left;border:none;cursor:pointer;">
+            <h3><%= pair.a.title %></h3>
+            <p style="color:var(--accent);margin-top:0.5rem;">Vote this one stronger →</p>
+          </button>
+        </form>
+        <div style="display:flex;align-items:center;color:var(--muted);font-family:var(--font-mono);">vs</div>
+        <form method="POST" action="/judge/pairwise/<%= encodeURIComponent(event.id) %>/compare">
+          <input type="hidden" name="_csrf" value="<%= csrf %>">
+          <input type="hidden" name="a" value="<%= pair.a.id %>">
+          <input type="hidden" name="b" value="<%= pair.b.id %>">
+          <input type="hidden" name="winner" value="<%= pair.b.id %>">
+          <button type="submit" class="card" style="width:100%;text-align:left;border:none;cursor:pointer;">
+            <h3><%= pair.b.title %></h3>
+            <p style="color:var(--accent);margin-top:0.5rem;">Vote this one stronger →</p>
+          </button>
+        </form>
+      </div>
+      <form method="POST" action="/judge/pairwise/<%= encodeURIComponent(event.id) %>/compare" style="margin-top:1rem;">
+        <input type="hidden" name="_csrf" value="<%= csrf %>">
+        <input type="hidden" name="a" value="<%= pair.a.id %>">
+        <input type="hidden" name="b" value="<%= pair.b.id %>">
+        <input type="hidden" name="winner" value="tie">
+        <button type="submit" class="btn btn-outline">Too close to call</button>
+      </form>
+    <% } %>
+  </div>
+</body>
+</html>

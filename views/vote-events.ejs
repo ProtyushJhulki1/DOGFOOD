@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Community Voting — Hackathon Raptors</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <% function statusClass(s) { return s === 'open' ? 'status--submitted' : (s === 'upcoming' ? 'status--draft' : ''); } %>
+  <nav>
+    <div class="brand">
+      <div class="brand-mark">🦖</div>
+      <span class="brand-name">Hackathon Raptors</span>
+    </div>
+    <span class="brand-tagline">a coder's dream</span>
+    <div class="links">
+      <a href="/">Home</a>
+      <a href="/projects">Gallery</a>
+      <% if (auth) { %>
+        <a href="/dashboard">Dashboard</a>
+        <a href="/logout">Logout</a>
+      <% } else { %>
+        <a href="/login" class="cta">Log In</a>
+      <% } %>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="section-eyebrow">// COMMUNITY VOTING</div>
+    <h1 class="page-title">Vote for your favorites</h1>
+
+    <% if (!events.length) { %>
+      <p style="color:var(--muted);">No event has voting turned on right now.</p>
+    <% } %>
+
+    <div class="project-grid">
+      <% events.forEach(function (e) { %>
+        <div class="card">
+          <div class="card-top">
+            <h3><%= e.name %></h3>
+            <span class="status <%= statusClass(e.status) %>"><%= e.status %></span>
+          </div>
+          <p><%= e.closes_at ? 'Closes ' + e.closes_at.slice(0, 16).replace('T', ' ') + ' UTC' : 'No closing time set' %></p>
+          <div class="card-meta">
+            <span></span>
+            <a href="/vote/<%= encodeURIComponent(e.id) %>">Open →</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+</body>
+</html>

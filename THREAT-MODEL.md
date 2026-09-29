@@ -39,6 +39,33 @@ This document covers realistic abuse scenarios against a hackathon submission an
 **Current status**: These tokens are intentionally simple and fixed for this build, per the spec's design (the checker needs a stable, printable header value, not a full login flow). This is acceptable for a hackathon-grading context but would be a real weakness in a production deployment.
 
 **How it would be addressed for production**: Real per-user sessions with hashed passwords (bcrypt is already a dependency in this project, unused for the grading-facing routes but ready for a real login system), token expiry, and per-user (not per-role) tokens so a single leak doesn't compromise every judge at once.
+## Sybil voting
+
+**Threat**: one person creates many participant accounts to cast many votes for the same project, since eligibility only requires a valid signup.
+
+**Mitigation in this build**: an admin can restrict voting to an explicit allowlist of emails per event, which caps the pool of eligible voters to whoever the organizer actually invited. In open mode, this isn't fully solved — signup has no email verification, so an attacker can create accounts with unverified addresses. The admin page includes an advisory signal that flags any network address behind three or more distinct voting accounts, so an organizer running a real event can spot-check unusually clustered activity. This is explicitly advisory, not a block: shared Wi-Fi, a university lab, or a phone carrier's NAT will trigger the same flag as a real Sybil attempt, so it's surfaced for human judgment, not auto-enforced.
+
+**Residual risk**: without email verification, a determined attacker with several email addresses is not fully stopped, only made visible if they share a network.
+
+## Ballot stuffing
+
+**Threat**: a single account votes for the same project many times, or an automated script fires vote requests in bulk.
+
+**Mitigation in this build**: each vote is a primary-key row on `(event, project, voter)`, so a second insert for the same triple fails at the database level, not just in application logic, and the route reports it back as an already-voted error rather than silently succeeding. Vote and comment requests are also rate-limited per account and per IP address within a sliding one-minute window; exceeding it returns an HTTP 429 rather than queueing or retrying automatically.
+
+## Judge collusion (extended for voting-adjacent signals)
+
+The existing role-isolation section already covers a judge reading another judge's scores. Pairwise comparisons add a second signal that could be gamed the same way if two judges coordinated their picks to inflate or bury a specific project. This build does not detect coordination between judges; it only guarantees that each judge's own comparisons are their own (backend-enforced, one vote per pair per judge) and that the Bradley-Terry estimate is computed from the full set of recorded comparisons, auditable by an organizer via the CSV export.
+
+## Hidden results and their limits
+
+**Threat**: seeing a running vote count could influence later voters, or a participant could infer standings before results are meant to be public.
+
+**Mitigation in this build**: vote totals are computed on every request from the stored votes, never cached in a way a voter's page could see, and the results section of the voting page is withheld from anyone but an admin while voting is open, unless the organizer explicitly opts into showing live totals for that event. This is enforced in the route handler itself, not by hiding a UI element, so requesting the page directly while logged in as a voter still returns no totals.
+
+## Deadline gaming (voting)
+
+The submission deadline section already covers project submissions. Voting windows use the same pattern: open and close times are checked against the server's own clock on every vote and comment request, not trusted from any client-supplied value, so a voter cannot vote early or late by manipulating their local time or replaying an old form.
 
 ## Summary
 
